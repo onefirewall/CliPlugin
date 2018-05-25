@@ -6,7 +6,7 @@ var CliPlugin = function (host, user, psw) {
         user: user,
         pass: psw
     });
-	
+
     this.setCommandWithIDS = function(callback) {
         createLoginWithSSH(ssh)
     }
