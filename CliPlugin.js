@@ -7,11 +7,21 @@ var CliPlugin = function (host, user, psw) {
         pass: psw
     });
 	
-	ssh.exec('echo command', {
+    this.setCommandWithIDS = function(callback) {
+        createLoginWithSSH(ssh)
+    }
+
+    this.getCommandWithIDS = function(callback) {
+        createLoginWithSSH(ssh)
+    }
+};
+
+function createLoginWithSSH(ssh) {
+    ssh.exec('echo command', {
         out: function(out) {
             console.log(out);
         }
     }).start();
-};
+}
 
 module.exports = CliPlugin;
