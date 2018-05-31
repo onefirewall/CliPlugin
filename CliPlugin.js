@@ -9,12 +9,20 @@ var CliPlugin = function (host, user, psw) {
         pass: psw
     });
 
-    this.setCommandWithIDS = function(callback) {
-        createLoginWithSSH(ssh)
+    this.addIpList = function(ipList, callback) {
+        getRootAccess(ssh);
+        getConfigAccess(ssh);
+        blockIPs(ssh, ipList);
+        exit(ssh);
+        exit(ssh);
     }
 
-    this.getCommandWithIDS = function(callback) {
-        createLoginWithSSH(ssh)
+    this.removeIpList = function(ipList, callback) {
+        getRootAccess(ssh);
+        getConfigAccess(ssh);
+        enableIPs(ssh, ipList);
+        exit(ssh);
+        exit(ssh);
     }
 };
 
@@ -66,7 +74,7 @@ function enableIPs(ssh, ipList) {
     }
 }
 
-function exit(ssh, ipList) {
+function exit(ssh) {
     ssh.exec('exit', {
         out: function(out) {
             console.log(out);
