@@ -26,14 +26,6 @@ var CliPlugin = function (host, user, psw) {
     }
 };
 
-function createLoginWithSSH(ssh) {
-    ssh.exec('echo command', {
-        out: function(out) {
-            console.log(out);
-        }
-    }).start();
-}
-
 function getRootAccess(ssh) {
     ssh.exec('enable', {
         out: function(out) {
