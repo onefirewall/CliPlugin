@@ -4,13 +4,13 @@ var async = require("async");
 
 // ******** end of global variables *****************
 
-#change to wanted hostname (name or ip)
+//change to wanted hostname (name or ip)
 var arrayOfConsoleServers =    [ "mdc-lab-slc-a.lab.wellmanage.com" ];         
-#hardcoded list for test
+//hardcoded list for test
 var ipLists = ["12.23.21.222", "23.22.11.33"];
-#list of commands template (todo: access-list assignment to interface 'ip access-group OneFire')
+//list of commands template (todo: access-list assignment to interface 'ip access-group OneFire')
 var arrayOfCommandsForConsoledHosts =    ["conf t","ip access-list standard OneFire","remark remark","end","exit","logout\r\n"];
-#adding at correct position ipS to block (to remove 'no deny ipList[i]')
+//adding at correct position ipS to block (to remove 'no deny ipList[i]')
 for(int i=0; i<ipList.length; i++) {
         arrayOfCommandsForConsoledHosts.splice(4+(2*i),0,"deny "+ipList[i]);
         arrayOfCommandsForConsoledHosts.splice(5+(2*i),0,"remark remark");
@@ -153,8 +153,7 @@ function mainApp(){
 
     // ********** verify environment is setup correctly ******
 
-
-	#To change with correct host (name or ip)
+    //To change with correct host (name or ip)
     var endHost = "Cisco";
 
     connectViaSSH(consoleServer, port, arrayOfCommandsForConsoledHosts, endHost,
