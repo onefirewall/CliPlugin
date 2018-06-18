@@ -1,4 +1,4 @@
 # CliPlugin
-
-## npm install simple-ssh
+#it should install everything required by js files
+## npm install . 
 ## node app
