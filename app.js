@@ -1,6 +1,16 @@
-var host = 'host';
-var user = 'user';
-var psw = 'psw';
+var PropertiesReader = require('properties-reader');
+var properties = PropertiesReader('./config/connection.properties');
+
+var property = properties.get('some.property.name');
+
+var host = properties.get('host');
+var user = properties.get('host');
+var psw = properties.get('psw');
+
+#if user e psw has not root privileges (can be encrypted with openssl enc/dec?)
+var rootUsr = properties.get('rootUsr');
+var rootPwd = properties.get('rootPwd');
+
 var cliPlugin = require('./CliPlugin.js');
 var cliPluginCommand = new cliPlugin(host, user, psw);
 
