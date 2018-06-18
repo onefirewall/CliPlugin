@@ -4,7 +4,7 @@ var properties = PropertiesReader('./config/connection.properties');
 var property = properties.get('some.property.name');
 
 var host = properties.get('host');
-var user = properties.get('host');
+var user = properties.get('user');
 var psw = properties.get('psw');
 
 #if user e psw has not root privileges (can be encrypted with openssl enc/dec?)
