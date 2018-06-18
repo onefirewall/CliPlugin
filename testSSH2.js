@@ -5,17 +5,13 @@ var async = require("async");
 // ******** end of global variables *****************
 
 //change to wanted hostname (name or ip)
-var arrayOfConsoleServers =    [ "mdc-lab-slc-a.lab.wellmanage.com" ];         
+var arrayOfConsoleServers =    [ "ciscoHost" ];         
 //hardcoded list for test
-var ipLists = ["12.23.21.222", "23.22.11.33"];
+var ipList = ["12.23.21.222", "23.22.11.33"];
 //list of commands template (todo: access-list assignment to interface 'ip access-group OneFire')
-var arrayOfCommandsForConsoledHosts =    ["conf t","ip access-list standard OneFire","remark remark","end","exit","logout\r\n"];
-//adding at correct position ipS to block (to remove 'no deny ipList[i]')
-for(int i=0; i<ipList.length; i++) {
-        arrayOfCommandsForConsoledHosts.splice(4+(2*i),0,"deny "+ipList[i]);
-        arrayOfCommandsForConsoledHosts.splice(5+(2*i),0,"remark remark");
-}
-
+//remark can be ignored probably
+var arrayOfCommandsTemplate =    ["conf t","ip access-list standard OneFire","remark remark","end","exit","logout\r\n"];
+var isAdd = true; //up to now it is always add (from main must be passed)
 // *********************  connection parameters  ************
 
 var readyTimeout = 45000;   // 45 seconds.
@@ -55,8 +51,20 @@ var arrayOfCipher = [
 
 
 
-var connectViaSSH = function(connectToHost, port, arrayOfCommands, endHost, callback) {
+var connectViaSSH = function(connectToHost, port, arrayOfCommands, isAdd, endHost, ipLists, callback) {
 
+    //adding/removing at correct position ipS to block
+    if(isAdd) {
+        for(int i=0; i<ipLists.length; i++) {
+                arrayOfCommands.splice(4+(2*i),0,"deny "+ipList[i]);
+                arrayOfCommands.splice(5+(2*i),0,"remark remark");
+        }
+    } else {
+        for(int i=0; i<ipLists.length; i++) {
+                arrayOfCommands.splice(4+(2*i),0,"no deny "+ipList[i]);
+                arrayOfCommands.splice(5+(2*i),0,"remark remark");
+        } 
+    }
     var listOfCommands = arrayOfCommands.slice(0,arrayOfCommands.length);       
                         // creating a cloned array because the commands are removed from passed variable as they are executed.
 
@@ -144,7 +152,7 @@ var connectViaSSH = function(connectToHost, port, arrayOfCommands, endHost, call
 
 
 
-function mainApp(){
+function mainApp(isAdd, ipList){
 
     var consoleServer = arrayOfConsoleServers[0];
     var port = 22;
@@ -154,9 +162,9 @@ function mainApp(){
     // ********** verify environment is setup correctly ******
 
     //To change with correct host (name or ip)
-    var endHost = "Cisco";
+    var endHost = "ciscoHost";
 
-    connectViaSSH(consoleServer, port, arrayOfCommandsForConsoledHosts, endHost,
+    connectViaSSH(consoleServer, port, arrayOfCommandsTemplate, isAdd, endHost, ipList,
         function(err, data){
 
             console.log(" -------- connected to consoled host: " + endHost + " -----------");
@@ -169,5 +177,5 @@ function mainApp(){
 
 }
 
-
-mainApp();
+//other params like user and pwd should pass from here
+mainApp(isAdd, ipList);
