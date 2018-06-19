@@ -4,6 +4,8 @@ var async = require("async");
 
 // ******** end of global variables *****************
 
+var CliPlugin2 = function() {
+
 //change to wanted hostname (name or ip)
 var arrayOfConsoleServers =    [ "ciscoHost" ];         
 //hardcoded list for test
@@ -175,6 +177,11 @@ function mainApp(opsType, ipList){
     );
 
 }
+
+
+}
+
+module.exports = CliPlugin2;
 
 //other params like hostname, user and pwd should pass from here
 mainApp(opsType, ipList);
