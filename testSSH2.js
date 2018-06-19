@@ -11,7 +11,9 @@ var ipList = ["12.23.21.222", "23.22.11.33"];
 //list of commands template (todo: access-list assignment to interface 'ip access-group OneFire')
 //remark can be ignored probably
 var arrayOfCommandsTemplate =    ["conf t","ip access-list standard OneFire","remark remark","end","exit","logout\r\n"];
-var isAdd = true; //up to now it is always add (from main must be passed)
+var arrayOfCommandsAssociate = ["conf t", "ip access-list standard OneFire", "end", "ip access-group OneFire in", "end", "exit"];
+//0 init, 1 add, 2 delete, for now
+var opsType = 1; //up to now it is always add (from main must be passed)
 // *********************  connection parameters  ************
 
 var readyTimeout = 45000;   // 45 seconds.
@@ -43,30 +45,36 @@ var arrayOfCipher = [
                 'aes256-gcm@openssh.com',
                 'aes256-cbc' ];
 
-
-
-
-
-
-
-
-
-var connectViaSSH = function(connectToHost, port, arrayOfCommands, isAdd, endHost, ipLists, callback) {
-
+/*
+******************
+*****All-in method
+******************
+*/
+var connectViaSSH = function(connectToHost, port, opsType, endHost, args, callback) {
+    var arrayOfCommands;
     //adding/removing at correct position ipS to block
-    if(isAdd) {
-        for(int i=0; i<ipLists.length; i++) {
-                arrayOfCommands.splice(4+(2*i),0,"deny "+ipList[i]);
-                arrayOfCommands.splice(5+(2*i),0,"remark remark");
+    if(opsType == 1) {
+        console.log("ADD operation, parsing ip list");
+        for(int i=0; i<args.length; i++) {
+                arrayOfCommandsTemplate.splice(4+(2*i),0,"deny "+args[i]);
+                arrayOfCommandsTemplate.splice(5+(2*i),0,"remark remark");
         }
+        arrayOfCommands = arrayOfCommandsTemplate;
+    } else if(opsType == 2) {
+        console.log("REMOVE operation, parsing ip list")
+        for(int i=0; i<args.length; i++) {
+                arrayOfCommandsTemplate.splice(4+(2*i),0,"no deny "+args[i]);
+                arrayOfCommandsTemplate.splice(5+(2*i),0,"remark remark");
+        }
+        arrayOfCommands = arrayOfCommandsTemplate;
+    } else if(opsType == 0) {
+        console.log("ASSOCIATE operation, adding interface")
+        arrayOfCommandsAssociate.splice(4,0,"interface "+args[0]);
+        arrayOfCommands = arrayOfCommandsAssociate;
     } else {
-        for(int i=0; i<ipLists.length; i++) {
-                arrayOfCommands.splice(4+(2*i),0,"no deny "+ipList[i]);
-                arrayOfCommands.splice(5+(2*i),0,"remark remark");
-        } 
+      console.log("Unsupported type of operation");
     }
     var listOfCommands = arrayOfCommands.slice(0,arrayOfCommands.length);       
-                        // creating a cloned array because the commands are removed from passed variable as they are executed.
 
     var connectedToConsoledHost  = false;
 
@@ -84,6 +92,7 @@ var connectViaSSH = function(connectToHost, port, arrayOfCommands, isAdd, endHos
                 cipher: arrayOfCipher
                 }
             },
+
             standardPrompt: customStandardPrompt,
             commands: listOfCommands,
             msg: {
@@ -91,6 +100,7 @@ var connectViaSSH = function(connectToHost, port, arrayOfCommands, isAdd, endHos
                     console.log("message: " + message);
                 }
             },
+
             verbose: verboseStatus,
             debug: debugStatus,
             idleTimeOut: idleTimeout,
@@ -98,73 +108,62 @@ var connectViaSSH = function(connectToHost, port, arrayOfCommands, isAdd, endHos
                 console.log('Connection :: keyboard-interactive');
                 finish([password]);
             },
+
             onCommandProcessing:   function( command, response, sshObj, stream  ) {
-
-                //console.log("in 'onCommandProcessing' ");
-
-                if (command === "" && response === "Connected to port 22." ) {
-
+                console.log("in 'onCommandProcessing' ");
+                if (command === "" && response === "Connected to port" ) {
                     connectedToConsoledHost = true;
                     stream.write("\r");
                     sshObj.msg.send("in 'onCommandProcessing' yes it matched. sending newline");
-
                 }
-
-            }, 
+            },
+      
             onCommandComplete:   function( command, response, sshObj ) {
-
                 if(connectedToConsoledHost == true){
-
                     if( response.indexOf(endHost) > -1){
-                        // host name matches.
-
-                        sshObj.msg.send(">>>>>>>> Console port connected to expected device. <<<<<<<<<<<< ");
+                        sshObj.msg.send("Console port connected");
                     }
-
                 }
+            },
 
-            }, 
             onCommandTimeout: function( command, response, stream, connection ) {
-
                 console.log("--->  entered onCommandTimeout with - \n command: '" + command + "' \n response: '" + response + "'");
                 stream.end();
                 connection.end();
+            },
 
-            },  
             onEnd: function( sessionText, sshObj ) {
                 sshObj.msg.send("reached 'onEnd'");
-                callback(0,sessionText);                // this sends the commands and output generated
+                callback(0,sessionText);
             }
 
         };
 
-    //Create a new instance
-    //var SSH2Shell = require ('ssh2shell-master'),                 //      doesn't work.
-   // var SSH2Shell = require ('ssh2shell-ssh2.connect-options'),     //     doesn't works 
-    var SSH2Shell = require ('ssh2shell'),     //      works 
-    SSH = new SSH2Shell(host);
+   //Create a new instance
+   // var SSH2Shell = require ('ssh2shell-ssh2.connect-options'),     //     doesn't work
+   var SSH2Shell = require ('ssh2shell'),     //    it  works 
+   SSH = new SSH2Shell(host);
 
-    //Start the process
-    SSH.connect();
+   SSH.connect();
 
 }
 
 
 
 
-function mainApp(isAdd, ipList){
+function mainApp(opsType, ipList){
 
     var consoleServer = arrayOfConsoleServers[0];
-    var port = 22;
+    var port = 22; //properties candidate?
 
     console.log("entered mainApp");
 
     // ********** verify environment is setup correctly ******
 
-    //To change with correct host (name or ip)
+    //To change with correct host (name or ip) -> properties candidate
     var endHost = "ciscoHost";
 
-    connectViaSSH(consoleServer, port, arrayOfCommandsTemplate, isAdd, endHost, ipList,
+    connectViaSSH(consoleServer, port, opsType, endHost, argumentList,
         function(err, data){
 
             console.log(" -------- connected to consoled host: " + endHost + " -----------");
@@ -177,5 +176,5 @@ function mainApp(isAdd, ipList){
 
 }
 
-//other params like user and pwd should pass from here
-mainApp(isAdd, ipList);
+//other params like hostname, user and pwd should pass from here
+mainApp(opsType, ipList);
