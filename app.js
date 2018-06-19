@@ -16,19 +16,14 @@ var ifc = properties.get('interface');
 var cliPlugin = require('./CliPlugin.js');
 var cliPluginCommand = new cliPlugin(host, user, psw);
 
-//access-list must be created and associated with interface ifc
-var isInitialized = properties.get('init');
-if(!isInitialized) {
-    cliPluginCommand.init(ifc ,function callback(jsonArray)) {
-       console.log(JSON.stringify(jsonArray[0]));
-    });
-    isInitialized = true;
-}
-
-cliPluginCommand.addIpList(ipList, function callback(jsonArray) {
+cliPluginCommand.connectViaSSH(0, ifc ,function callback(jsonArray)) {
     console.log(JSON.stringify(jsonArray[0]));
 });
 
-cliPluginCommand.removeIpList(ipList, function callback(jsonArray) {
+cliPluginCommand.connectViaSSH(1, ipList, function callback(jsonArray) {
+    console.log(JSON.stringify(jsonArray[0]));
+});
+
+cliPluginCommand.connectViaSSH(2, ipList, function callback(jsonArray) {
     console.log(JSON.stringify(jsonArray[0]));
 });
