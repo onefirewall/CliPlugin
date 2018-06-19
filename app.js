@@ -13,8 +13,10 @@ var rootPwd = properties.get('rootPwd');
 
 var ifc = properties.get('interface');
 
-var cliPlugin = require('./CliPlugin.js');
-var cliPluginCommand = new cliPlugin(host, user, psw);
+//var cliPlugin = require('./CliPlugin.js');
+//var cliPluginCommand = new cliPlugin(host, user, psw);
+var cliPlugin2 = require('./testSSH2.js');
+var cliPluginCommand = new cliPlugin2();
 
 cliPluginCommand.connectViaSSH(0, ifc ,function callback(jsonArray)) {
     console.log(JSON.stringify(jsonArray[0]));
