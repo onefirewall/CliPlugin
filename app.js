@@ -7,7 +7,7 @@ var host = properties.get('host');
 var user = properties.get('user');
 var psw = properties.get('psw');
 
-#if user e psw has not root privileges (can be encrypted with openssl enc/dec?)
+//if user e psw has not root privileges (can be encrypted with openssl enc/dec?)
 var rootUsr = properties.get('rootUsr');
 var rootPwd = properties.get('rootPwd');
 
@@ -18,7 +18,7 @@ var ifc = properties.get('interface');
 var cliPlugin2 = require('./testSSH2.js');
 var cliPluginCommand = new cliPlugin2();
 
-cliPluginCommand.connectViaSSH(0, ifc ,function callback(jsonArray)) {
+cliPluginCommand.connectViaSSH(0, ifc ,function callback(jsonArray) {
     console.log(JSON.stringify(jsonArray[0]));
 });
 
