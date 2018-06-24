@@ -23,7 +23,7 @@ var idleTimeout = 30000;   // 10 seconds.
 
 var verboseStatus = true;
 var debugStatus = true;
-#if root no problem, else login command must be added
+//if root no problem, else login command must be added
 var username = "cisco";
 var password = "cisco";
 
@@ -57,14 +57,14 @@ var connectViaSSH = function(connectToHost, port, opsType, endHost, args, callba
     //adding/removing at correct position ipS to block
     if(opsType == 1) {
         console.log("ADD operation, parsing ip list");
-        for(int i=0; i<args.length; i++) {
+        for(var i=0; i<args.length; i++) {
                 arrayOfCommandsTemplate.splice(4+(2*i),0,"deny "+args[i]);
                 arrayOfCommandsTemplate.splice(5+(2*i),0,"remark remark");
         }
         arrayOfCommands = arrayOfCommandsTemplate;
     } else if(opsType == 2) {
         console.log("REMOVE operation, parsing ip list")
-        for(int i=0; i<args.length; i++) {
+        for(var i=0; i<args.length; i++) {
                 arrayOfCommandsTemplate.splice(4+(2*i),0,"no deny "+args[i]);
                 arrayOfCommandsTemplate.splice(5+(2*i),0,"remark remark");
         }
@@ -184,4 +184,4 @@ function mainApp(opsType, ipList){
 module.exports = CliPlugin2;
 
 //other params like hostname, user and pwd should pass from here
-mainApp(opsType, ipList);
+//mainApp(opsType, ipList);
