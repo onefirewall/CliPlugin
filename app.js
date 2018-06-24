@@ -23,10 +23,16 @@ cliPluginCommand.mainApp(host, 0 , ifc);
  //   console.log(JSON.stringify(jsonArray[0]));
 //});
 
+//exampleList
+//varIpList=["222.12.3.22", "23.11.3.2"];
+cliPluginCommand.mainApp(host, 1 , ipList);
+
 //ADD
 //cliPluginCommand.mainApp(host, 1, ipList, function callback(jsonArray) {
  //   console.log(JSON.stringify(jsonArray[0]));
 //});
+
+cliPluginCommand.mainApp(host, 2 , ipList);
 
 //DELETE
 //cliPluginCommand.mainApp(host, 2, ipList, function callback(jsonArray) {
