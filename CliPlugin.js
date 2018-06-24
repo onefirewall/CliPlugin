@@ -10,8 +10,7 @@ var CliPlugin = function() {
 var arrayOfConsoleServers =    [ "ciscoHost" ];         
 //hardcoded list for test
 var ipList = ["12.23.21.222", "23.22.11.33"];
-//list of commands template (todo: access-list assignment to interface 'ip access-group OneFire')
-//remark can be ignored probably
+//TODO: Associate needs a permit any at the bottom, otherwise all the traffic inwards will be blocked regardless of rules
 var arrayOfCommandsTemplate =    ["conf t","ip access-list standard OneFire","end","exit"];
 var arrayOfCommandsAssociate = ["conf t", "ip access-list standard OneFire", "end", "conf t", "ip access-group OneFire in", "end", "exit"];
 //0 init, 1 add, 2 delete, for now
