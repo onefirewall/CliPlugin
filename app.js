@@ -18,14 +18,14 @@ var ifc = properties.get('interface');
 var cliPlugin2 = require('./testSSH2.js');
 var cliPluginCommand = new cliPlugin2();
 
-cliPluginCommand.connectViaSSH(0, ifc ,function callback(jsonArray) {
+cliPluginCommand.connectViaSSH(host, 22, 0, host, ifc ,function callback(jsonArray) {
     console.log(JSON.stringify(jsonArray[0]));
 });
 
-cliPluginCommand.connectViaSSH(1, ipList, function callback(jsonArray) {
+cliPluginCommand.connectViaSSH(host, 22, 1, host, ipList, function callback(jsonArray) {
     console.log(JSON.stringify(jsonArray[0]));
 });
 
-cliPluginCommand.connectViaSSH(2, ipList, function callback(jsonArray) {
+cliPluginCommand.connectViaSSH(host, 22, 2, host, ipList, function callback(jsonArray) {
     console.log(JSON.stringify(jsonArray[0]));
 });
