@@ -153,9 +153,9 @@ var connectViaSSH = function(connectToHost, port, opsType, endHost, args, callba
 
 
 
-this.mainApp = function(opsType, argumentList){
+this.mainApp = function(host, opsType, argumentList){
 
-    var consoleServer = arrayOfConsoleServers[0];
+    var consoleServer = host;
     var port = 22; //properties candidate?
 
     console.log("entered mainApp");
@@ -163,7 +163,7 @@ this.mainApp = function(opsType, argumentList){
     // ********** verify environment is setup correctly ******
 
     //To change with correct host (name or ip) -> properties candidate
-    var endHost = "ciscoHost";
+    var endHost = host;
 
     connectViaSSH(consoleServer, port, opsType, endHost, argumentList,
         function(err, data){
@@ -184,4 +184,4 @@ this.mainApp = function(opsType, argumentList){
 module.exports = CliPlugin;
 
 //other params like hostname, user and pwd should pass from here
-//mainApp(opsType, ipList);
+//mainApp(host, opsType, ipList);
