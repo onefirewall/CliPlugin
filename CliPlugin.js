@@ -12,7 +12,7 @@ var arrayOfConsoleServers =    [ "ciscoHost" ];
 var ipList = ["12.23.21.222", "23.22.11.33"];
 //list of commands template (todo: access-list assignment to interface 'ip access-group OneFire')
 //remark can be ignored probably
-var arrayOfCommandsTemplate =    ["conf t","ip access-list standard OneFire","remark remark","end","exit","logout\r\n"];
+var arrayOfCommandsTemplate =    ["conf t","ip access-list standard OneFire","end","exit"];
 var arrayOfCommandsAssociate = ["conf t", "ip access-list standard OneFire", "end", "conf t", "ip access-group OneFire in", "end", "exit"];
 //0 init, 1 add, 2 delete, for now
 var opsType = 1; //up to now it is always add (from main must be passed)
@@ -58,15 +58,13 @@ var connectViaSSH = function(connectToHost, port, opsType, endHost, args, callba
     if(opsType == 1) {
         console.log("ADD operation, parsing ip list");
         for(var i=0; i<args.length; i++) {
-                arrayOfCommandsTemplate.splice(4+(2*i),0,"deny "+args[i]);
-                arrayOfCommandsTemplate.splice(5+(2*i),0,"remark remark");
+                arrayOfCommandsTemplate.splice(2+i,0,"deny "+args[i]);
         }
         arrayOfCommands = arrayOfCommandsTemplate;
     } else if(opsType == 2) {
         console.log("REMOVE operation, parsing ip list")
         for(var i=0; i<args.length; i++) {
-                arrayOfCommandsTemplate.splice(4+(2*i),0,"no deny "+args[i]);
-                arrayOfCommandsTemplate.splice(5+(2*i),0,"remark remark");
+                arrayOfCommandsTemplate.splice(2+i,0,"no deny "+args[i]);
         }
         arrayOfCommands = arrayOfCommandsTemplate;
     } else if(opsType == 0) {
