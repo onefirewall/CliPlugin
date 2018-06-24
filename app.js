@@ -13,19 +13,18 @@ var rootPwd = properties.get('rootPwd');
 
 var ifc = properties.get('interface');
 
-//var cliPlugin = require('./CliPlugin.js');
+var CliPlugin = require('./CliPlugin.js');
 //var cliPluginCommand = new cliPlugin(host, user, psw);
-var cliPlugin2 = require('./testSSH2.js');
-var cliPluginCommand = new cliPlugin2();
+var cliPluginCommand = new CliPlugin();
 
-cliPluginCommand.connectViaSSH(host, 22, 0, host, ifc ,function callback(jsonArray) {
+cliPluginCommand.mainApp(host, 22, 0, host, ifc ,function callback(jsonArray) {
     console.log(JSON.stringify(jsonArray[0]));
 });
 
-cliPluginCommand.connectViaSSH(host, 22, 1, host, ipList, function callback(jsonArray) {
+cliPluginCommand.mainApp(host, 22, 1, host, ipList, function callback(jsonArray) {
     console.log(JSON.stringify(jsonArray[0]));
 });
 
-cliPluginCommand.connectViaSSH(host, 22, 2, host, ipList, function callback(jsonArray) {
+cliPluginCommand.mainApp(host, 22, 2, host, ipList, function callback(jsonArray) {
     console.log(JSON.stringify(jsonArray[0]));
 });
