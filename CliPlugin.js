@@ -13,7 +13,7 @@ var ipList = ["12.23.21.222", "23.22.11.33"];
 //list of commands template (todo: access-list assignment to interface 'ip access-group OneFire')
 //remark can be ignored probably
 var arrayOfCommandsTemplate =    ["conf t","ip access-list standard OneFire","remark remark","end","exit","logout\r\n"];
-var arrayOfCommandsAssociate = ["conf t", "ip access-list standard OneFire", "end", "ip access-group OneFire in", "end", "exit"];
+var arrayOfCommandsAssociate = ["conf t", "ip access-list standard OneFire", "end", "conf t", "ip access-group OneFire in", "end", "exit"];
 //0 init, 1 add, 2 delete, for now
 var opsType = 1; //up to now it is always add (from main must be passed)
 // *********************  connection parameters  ************
@@ -71,7 +71,7 @@ var connectViaSSH = function(connectToHost, port, opsType, endHost, args, callba
         arrayOfCommands = arrayOfCommandsTemplate;
     } else if(opsType == 0) {
         console.log("ASSOCIATE operation, adding interface")
-        arrayOfCommandsAssociate.splice(4,0,"interface "+args[0]);
+        arrayOfCommandsAssociate.splice(4,0,"interface "+args);
         arrayOfCommands = arrayOfCommandsAssociate;
     } else {
       console.log("Unsupported type of operation");
