@@ -4,7 +4,7 @@ var async = require("async");
 
 // ******** end of global variables *****************
 
-var CliPlugin2 = function() {
+var CliPlugin = function() {
 
 //change to wanted hostname (name or ip)
 var arrayOfConsoleServers =    [ "ciscoHost" ];         
@@ -153,7 +153,7 @@ var connectViaSSH = function(connectToHost, port, opsType, endHost, args, callba
 
 
 
-function mainApp(opsType, ipList){
+this.mainApp = function(opsType, argumentList){
 
     var consoleServer = arrayOfConsoleServers[0];
     var port = 22; //properties candidate?
@@ -181,7 +181,7 @@ function mainApp(opsType, ipList){
 
 }
 
-module.exports = CliPlugin2;
+module.exports = CliPlugin;
 
 //other params like hostname, user and pwd should pass from here
 //mainApp(opsType, ipList);
