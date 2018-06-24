@@ -17,14 +17,14 @@ var CliPlugin = require('./CliPlugin.js');
 //var cliPluginCommand = new cliPlugin(host, user, psw);
 var cliPluginCommand = new CliPlugin();
 
-cliPluginCommand.mainApp(host, 22, 0, host, ifc ,function callback(jsonArray) {
+cliPluginCommand.mainApp(host, 0, ifc ,function callback(jsonArray) {
     console.log(JSON.stringify(jsonArray[0]));
 });
 
-cliPluginCommand.mainApp(host, 22, 1, host, ipList, function callback(jsonArray) {
+cliPluginCommand.mainApp(host, 1, ipList, function callback(jsonArray) {
     console.log(JSON.stringify(jsonArray[0]));
 });
 
-cliPluginCommand.mainApp(host, 22, 2, host, ipList, function callback(jsonArray) {
+cliPluginCommand.mainApp(host, 2, ipList, function callback(jsonArray) {
     console.log(JSON.stringify(jsonArray[0]));
 });
