@@ -1,0 +1,18 @@
+
+{
+  "name": "cliplugin",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/onefirewall/CliPlugin.git"
+  },
+  "dependencies": {
+    "properties-reader": "^0.0.16",
+    "util": "^0.11.0",
+    "sleep": "^5.1.1",
+    "async": "^2.6.1",
+    "ssh2shell": "^1.9.0"
+  }
+}
