@@ -11,8 +11,10 @@ var arrayOfConsoleServers =    [ "ciscoHost" ];
 //hardcoded list for test
 var ipList = ["12.23.21.222", "23.22.11.33"];
 //TODO: Associate needs a permit any at the bottom, otherwise all the traffic inwards will be blocked regardless of rules
-var arrayOfCommandsTemplate =    ["conf t","ip access-list standard OneFire","end","exit"];
+var arrayOfCommandsTemplate =    ["conf t","ip access-list standard OneFire", "permit any","end","exit"];
 var arrayOfCommandsAssociate = ["conf t", "ip access-list standard OneFire", "end", "conf t", "ip access-group OneFire in", "end", "exit"];
+var arrayOfCommandsSnap = ["conf t", "no ip access-group OneFire in", "end", "conf t", "ip access-list standard OneFire", "no permit any", "permit any", "end", "conf t", "ip access-group OneFire in", "end", "exit"];
+
 //0 init, 1 add, 2 delete, for now
 var opsType = 1; //up to now it is always add (from main must be passed)
 // *********************  connection parameters  ************
@@ -51,16 +53,23 @@ var arrayOfCipher = [
 *****All-in method
 ******************
 */
-var connectViaSSH = function(connectToHost, port, opsType, endHost, args, callback) {
+var connectViaSSH = function(connectToHost, port, opsType, endHost, args, ifc, callback) {
     var arrayOfCommands;
     //adding/removing at correct position ipS to block
     if(opsType == 1) {
         console.log("ADD operation, parsing ip list");
-        for(var i=0; i<args.length; i++) {
-                arrayOfCommandsTemplate.splice(2+i,0,"deny "+args[i]);
+        arrayOfCommandsSnap.splice(1,0,"interface "+ifc);
+        var i=0;
+        while(i<args.length) {
+                arrayOfCommandsSnap.splice(7+i,0,"deny "+args[i]);
+                i++
         }
-        arrayOfCommands = arrayOfCommandsTemplate;
-    } else if(opsType == 2) {
+        arrayOfCommandsSnap.splice(10+i,0,"interface "+ifc);
+
+        arrayOfCommands = arrayOfCommandsSnap;
+    }
+    //not needed  
+    else if(opsType == 2) {
         console.log("REMOVE operation, parsing ip list")
         for(var i=0; i<args.length; i++) {
                 arrayOfCommandsTemplate.splice(2+i,0,"no deny "+args[i]);
@@ -150,7 +159,7 @@ var connectViaSSH = function(connectToHost, port, opsType, endHost, args, callba
 
 
 
-this.mainApp = function(host, opsType, argumentList){
+this.mainApp = function(host, opsType, argumentList, ifc){
 
     var consoleServer = host;
     var port = 22; //properties candidate?
@@ -162,7 +171,7 @@ this.mainApp = function(host, opsType, argumentList){
     //To change with correct host (name or ip) -> properties candidate
     var endHost = host;
 
-    connectViaSSH(consoleServer, port, opsType, endHost, argumentList,
+    connectViaSSH(consoleServer, port, opsType, endHost, argumentList, ifc,
         function(err, data){
 
             console.log(" -------- connected to consoled host: " + endHost + " -----------");
