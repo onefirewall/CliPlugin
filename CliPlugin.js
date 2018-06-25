@@ -6,17 +6,9 @@ var async = require("async");
 
 var CliPlugin = function() {
 
-//change to wanted hostname (name or ip)
-var arrayOfConsoleServers =    [ "ciscoHost" ];         
-//hardcoded list for test
-var ipList = ["12.23.21.222", "23.22.11.33"];
-//TODO: Associate needs a permit any at the bottom, otherwise all the traffic inwards will be blocked regardless of rules
-var arrayOfCommandsTemplate =    ["conf t","ip access-list standard OneFire", "permit any","end","exit"];
-var arrayOfCommandsAssociate = ["conf t", "ip access-list standard OneFire", "end", "conf t", "ip access-group OneFire in", "end", "exit"];
+
 var arrayOfCommandsSnap = ["conf t", "no ip access-group OneFire in", "end", "conf t", "ip access-list standard OneFire", "no permit any", "permit any", "end", "conf t", "ip access-group OneFire in", "end", "exit"];
 
-//0 init, 1 add, 2 delete, for now
-var opsType = 1; //up to now it is always add (from main must be passed)
 // *********************  connection parameters  ************
 
 var readyTimeout = 45000;   // 45 seconds.
@@ -68,18 +60,7 @@ var connectViaSSH = function(connectToHost, port, opsType, endHost, args, ifc, c
 
         arrayOfCommands = arrayOfCommandsSnap;
     }
-    //not needed  
-    else if(opsType == 2) {
-        console.log("REMOVE operation, parsing ip list")
-        for(var i=0; i<args.length; i++) {
-                arrayOfCommandsTemplate.splice(2+i,0,"no deny "+args[i]);
-        }
-        arrayOfCommands = arrayOfCommandsTemplate;
-    } else if(opsType == 0) {
-        console.log("ASSOCIATE operation, adding interface")
-        arrayOfCommandsAssociate.splice(4,0,"interface "+args);
-        arrayOfCommands = arrayOfCommandsAssociate;
-    } else {
+    else {
       console.log("Unsupported type of operation");
     }
     var listOfCommands = arrayOfCommands.slice(0,arrayOfCommands.length);       
@@ -148,8 +129,7 @@ var connectViaSSH = function(connectToHost, port, opsType, endHost, args, ifc, c
         };
 
    //Create a new instance
-   // var SSH2Shell = require ('ssh2shell-ssh2.connect-options'),     //     doesn't work
-   var SSH2Shell = require ('ssh2shell'),     //    it  works 
+   var SSH2Shell = require ('ssh2shell'),
    SSH = new SSH2Shell(host);
 
    SSH.connect();
@@ -188,6 +168,3 @@ this.mainApp = function(host, opsType, argumentList, ifc){
 }
 
 module.exports = CliPlugin;
-
-//other params like hostname, user and pwd should pass from here
-//mainApp(host, opsType, ipList);
