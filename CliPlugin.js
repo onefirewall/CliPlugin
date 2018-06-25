@@ -25,8 +25,8 @@ var idleTimeout = 30000;   // 10 seconds.
 var verboseStatus = true;
 var debugStatus = true;
 //if root no problem, else login command must be added
-var username = "cisco";
-var password = "cisco";
+var username = "root";
+var password = "root";
 
 var customStandardPrompt = ">$%#)(";   // default prompt
 
