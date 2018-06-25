@@ -16,7 +16,6 @@ var ifc = properties.get('interface');
 var CliPlugin = require('./CliPlugin.js');
 //var cliPluginCommand = new cliPlugin(host, user, psw);
 var cliPluginCommand = new CliPlugin();
-cliPluginCommand.mainApp(host, 0 , ifc);
 
 //INIT
 //cliPluginCommand.mainApp(host, 0, ifc ,function callback(jsonArray) {
@@ -25,14 +24,15 @@ cliPluginCommand.mainApp(host, 0 , ifc);
 
 //exampleList
 //varIpList=["222.12.3.22", "23.11.3.2"];
-cliPluginCommand.mainApp(host, 1 , ipList);
+
+
+cliPluginCommand.mainApp(host, 1 , ipList, ifc);
 
 //ADD
 //cliPluginCommand.mainApp(host, 1, ipList, function callback(jsonArray) {
  //   console.log(JSON.stringify(jsonArray[0]));
 //});
 
-cliPluginCommand.mainApp(host, 2 , ipList);
 
 //DELETE
 //cliPluginCommand.mainApp(host, 2, ipList, function callback(jsonArray) {
