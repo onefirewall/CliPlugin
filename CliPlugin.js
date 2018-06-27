@@ -47,7 +47,7 @@ var arrayOfCipher = [
 *****All-in internal method
 ***************************
 */
-var connectViaSSH = function(opsType, ipList, ifc, port, callback) {
+var connectViaSSH = function(host, user, psw, opsType, ipList, ifc, port, callback) {
     var listOfCommands;
   
     switch(opsType) {
@@ -71,8 +71,10 @@ var connectViaSSH = function(opsType, ipList, ifc, port, callback) {
         var arrayOfCommandsDelete = ["conf t", "ip access-list standard "+ accessListName, "end", "exit"];
         
         console.log("DELETE operation, parsing ip list");
-        for (var i=0; i++; i<ipList.length) {
+        var i=0;
+        while (i<ipList.length) {
                 arrayOfCommandsDelete.splice(2+i,0,"no deny "+ipList[i]);
+                i++;
         }
         listOfCommands = arrayOfCommandsDelete.slice(0,arrayOfCommandsDelete.length)
         break;
@@ -95,10 +97,10 @@ var connectViaSSH = function(opsType, ipList, ifc, port, callback) {
 
     var host = {
         server: {
-            host: this.host,
+            host: host,
             port: port,
-            userName: this.user,
-            password: this.psw,
+            userName: user,
+            password: psw,
             hashMethod:     "md5", 
             readyTimeout: readyTimeout,
             tryKeyboard: true,
@@ -160,8 +162,8 @@ var connectViaSSH = function(opsType, ipList, ifc, port, callback) {
         };
 
    //Commands execution
-   var SSH = new SSH2Shell(host);
    var SSH2Shell = require ('ssh2shell');
+   var SSH = new SSH2Shell(host);
    SSH.connect();
 
 }
@@ -179,7 +181,7 @@ this.sshToNode = function(opsType, ipList, ifc, port){
       console.log("IP list cannot be empty when ADD or DELETE operations are called")
       return;
     }
-    connectViaSSH(opsType, ipList, ifc, port,
+    connectViaSSH(this.host, this.user, this.psw, opsType, ipList, ifc, port,
         function(err, data){
 
             console.log(" -------- connected to consoled host: " + this.host + " -----------");
