@@ -1,9 +1,3 @@
-//TOCHECK are those really needed?
-var util = require('util');
-var sleep = require('system-sleep');
-var async = require("async");
-
-// ******** end of global variables *****************
 
 var CliPlugin = function(host, user, psw) {
 
@@ -19,8 +13,8 @@ var accessListName = "OneFirewall"
 var readyTimeout = 45000;   // 45 seconds.
 var idleTimeout = 30000;   // 10 seconds.
 
-var verboseStatus = true;
-var debugStatus = true;
+var verboseStatus = false;
+var debugStatus = false;
 
 var customStandardPrompt = ">$%#)(";   // default prompt
 
@@ -81,7 +75,7 @@ var connectViaSSH = function(host, user, psw, opsType, ipList, ifc, port, callba
         
       case 3:
         //TOCHECK does this de-associate the access-list?
-        var arrayOfCommandsClear = ["conf t", "no ip access-list standard "+ accessListName, "end", "exit"];
+        var arrayOfCommandsClear = ["conf t", "interface " + ifc , "no ip access-group "+ accessListName + " in", "end", "conf t", "no ip access-list standard "+ accessListName, "end", "exit"];
 
         console.log("CLEAR operation");
         listOfCommands = arrayOfCommandsClear.slice(0,arrayOfCommandsClear.length)
