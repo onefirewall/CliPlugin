@@ -121,7 +121,6 @@ var connectViaSSH = function(host, user, psw, opsType, ipList, ifc, port, callba
             },
 
             onCommandProcessing:   function( command, response, sshObj, stream  ) {
-                console.log("in 'onCommandProcessing' ");
                 if (command === "" && response === "Connected to port" ) {
                     connectedToConsoledHost = true;
                     stream.write("\r");
