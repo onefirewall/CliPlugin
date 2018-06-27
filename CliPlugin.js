@@ -16,7 +16,7 @@ var idleTimeout = 30000;   // 10 seconds.
 var verboseStatus = false;
 var debugStatus = false;
 
-var customStandardPrompt = ">$%#)(";   // default prompt
+var customStandardPrompt = "#)(";   // default prompt
 
 var arrayOfKex = [
                 'diffie-hellman-group1-sha1',
@@ -106,12 +106,6 @@ var connectViaSSH = function(host, user, psw, opsType, ipList, ifc, port, callba
 
             standardPrompt: customStandardPrompt,
             commands: listOfCommands,
-            msg: {
-                send: function( message ) {
-                    console.log("message: " + message);
-                }
-            },
-
             verbose: verboseStatus,
             debug: debugStatus,
             idleTimeOut: idleTimeout,
@@ -119,23 +113,6 @@ var connectViaSSH = function(host, user, psw, opsType, ipList, ifc, port, callba
                 console.log('Connection :: keyboard-interactive');
                 finish([password]);
             },
-
-            onCommandProcessing:   function( command, response, sshObj, stream  ) {
-                if (command === "" && response === "Connected to port" ) {
-                    connectedToConsoledHost = true;
-                    stream.write("\r");
-                    sshObj.msg.send("in 'onCommandProcessing' yes it matched. sending newline");
-                }
-            },
-            //print here
-            onCommandComplete:   function( command, response, sshObj ) {
-                if(connectedToConsoledHost == true){
-                    if( response.indexOf(endHost) > -1){
-                        sshObj.msg.send("Console port connected");
-                    }
-                }
-            },
-
             onCommandTimeout: function( command, response, stream, connection ) {
                 console.log("--->  entered onCommandTimeout with - \n command: '" + command + "' \n response: '" + response + "'");
                 stream.end();
@@ -179,7 +156,6 @@ this.sshToNode = function(opsType, ipList, ifc, port){
             console.log(" ---  end of data received from last consoled host ------  ");
         }
     );
-    console.log("Exiting CliPlugin module");
 
 }
 
