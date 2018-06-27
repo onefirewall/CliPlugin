@@ -1,3 +1,4 @@
+//TOCHECK are those really needed?
 var util = require('util');
 var sleep = require('system-sleep');
 var async = require("async");
@@ -11,7 +12,7 @@ this.user = user;
 this.psw = psw;
 
 var accessListName = "OneFirewall"
-var arrayOfCommandsSnap = ["conf t", "no ip access-group " + accessListName + " in", "end", "conf t", "ip access-list standard "+ accessListName, "no permit any", "permit any", "end", "conf t", "ip access-group " + accessListName + " in", "end", "exit"];
+
 
 // *********************  connection parameters  ************
 
@@ -42,29 +43,53 @@ var arrayOfCipher = [
                 'aes256-cbc' ];
 
 /*
-******************
-*****All-in method
-******************
+***************************
+*****All-in internal method
+***************************
 */
 var connectViaSSH = function(opsType, ipList, ifc, port, callback) {
-    var arrayOfCommands;
-    //adding/removing at correct position ipS to block
-    if(opsType == 1) {
+    var listOfCommands;
+  
+    switch(opsType) {
+        
+      case 1:
+        var arrayOfCommandsAdd = ["conf t", "no ip access-group " + accessListName + " in", "end", "conf t", "ip access-list standard "+ accessListName, "no permit any", "permit any", "end", "conf t", "ip access-group " + accessListName + " in", "end", "exit"];
+        
         console.log("ADD operation, parsing ip list");
-        arrayOfCommandsSnap.splice(1,0,"interface "+ifc);
+        arrayOfCommandsAdd.splice(1,0,"interface "+ifc);
         var i=0;
         while(i<ipList.length) {
-                arrayOfCommandsSnap.splice(7+i,0,"deny "+ipList[i]);
+                arrayOfCommandsAdd.splice(7+i,0,"deny "+ipList[i]);
                 i++
         }
-        arrayOfCommandsSnap.splice(10+i,0,"interface "+ifc);
+        arrayOfCommandsAdd.splice(10+i,0,"interface "+ifc);
+        listOfCommands = arrayOfCommandsAdd.slice(0,arrayOfCommandsAdd.length)
+  
+        break;
+      
+      case 2:
+        var arrayOfCommandsDelete = ["conf t", "ip access-list standard "+ accessListName, "end", "exit"];
+        
+        console.log("DELETE operation, parsing ip list");
+        for (var i=0; i++; i<ipList.length) {
+                arrayOfCommandsDelete.splice(2+i,0,"no deny "+ipList[i]);
+        }
+        listOfCommands = arrayOfCommandsDelete.slice(0,arrayOfCommandsDelete.length)
+        break;
+        
+      case 3:
+        //TOCHECK does this de-associate the access-list?
+        var arrayOfCommandsClear = ["conf t", "no ip access-list standard "+ accessListName, "end", "exit"];
 
-        arrayOfCommands = arrayOfCommandsSnap;
+        console.log("CLEAR operation");
+        listOfCommands = arrayOfCommandsClear.slice(0,arrayOfCommandsClear.length)
+        break;
+   
+      default:
+        console.log("Unsupported type of operation");
+        return;
+
     }
-    else {
-      console.log("Unsupported type of operation");
-    }
-    var listOfCommands = arrayOfCommands.slice(0,arrayOfCommands.length);       
 
     var connectedToConsoledHost  = false;
 
@@ -134,21 +159,26 @@ var connectViaSSH = function(opsType, ipList, ifc, port, callback) {
 
         };
 
-   //Create a new instance
-   var SSH2Shell = require ('ssh2shell'),
-   SSH = new SSH2Shell(host);
-
+   //Commands execution
+   var SSH = new SSH2Shell(host);
+   var SSH2Shell = require ('ssh2shell');
    SSH.connect();
 
 }
 
 
-
-
+/*
+********************
+*****Exported method
+********************
+*/
 this.sshToNode = function(opsType, ipList, ifc, port){
 
     console.log("CliPlugin module");
-
+    if(!ipList.length && (opsType == 1 || opsType == 2)) {
+      console.log("IP list cannot be empty when ADD or DELETE operations are called")
+      return;
+    }
     connectViaSSH(opsType, ipList, ifc, port,
         function(err, data){
 
@@ -159,6 +189,7 @@ this.sshToNode = function(opsType, ipList, ifc, port){
             console.log(" ---  end of data received from last consoled host ------  ");
         }
     );
+    console.log("Exiting CliPlugin module");
 
 }
 
