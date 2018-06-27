@@ -4,10 +4,14 @@ var async = require("async");
 
 // ******** end of global variables *****************
 
-var CliPlugin = function() {
+var CliPlugin = function(host, user, psw) {
 
+this.host = host;
+this.user = user;
+this.psw = psw;
 
-var arrayOfCommandsSnap = ["conf t", "no ip access-group OneFire in", "end", "conf t", "ip access-list standard OneFire", "no permit any", "permit any", "end", "conf t", "ip access-group OneFire in", "end", "exit"];
+var accessListName = "OneFirewall"
+var arrayOfCommandsSnap = ["conf t", "no ip access-group " + accessListName + " in", "end", "conf t", "ip access-list standard "+ accessListName, "no permit any", "permit any", "end", "conf t", "ip access-group " + accessListName + " in", "end", "exit"];
 
 // *********************  connection parameters  ************
 
@@ -16,9 +20,6 @@ var idleTimeout = 30000;   // 10 seconds.
 
 var verboseStatus = true;
 var debugStatus = true;
-//if root no problem, else login command must be added
-var username = "root";
-var password = "root";
 
 var customStandardPrompt = ">$%#)(";   // default prompt
 
@@ -45,15 +46,15 @@ var arrayOfCipher = [
 *****All-in method
 ******************
 */
-var connectViaSSH = function(connectToHost, port, opsType, endHost, args, ifc, callback) {
+var connectViaSSH = function(opsType, ipList, ifc, port, callback) {
     var arrayOfCommands;
     //adding/removing at correct position ipS to block
     if(opsType == 1) {
         console.log("ADD operation, parsing ip list");
         arrayOfCommandsSnap.splice(1,0,"interface "+ifc);
         var i=0;
-        while(i<args.length) {
-                arrayOfCommandsSnap.splice(7+i,0,"deny "+args[i]);
+        while(i<ipList.length) {
+                arrayOfCommandsSnap.splice(7+i,0,"deny "+ipList[i]);
                 i++
         }
         arrayOfCommandsSnap.splice(10+i,0,"interface "+ifc);
@@ -69,10 +70,10 @@ var connectViaSSH = function(connectToHost, port, opsType, endHost, args, ifc, c
 
     var host = {
         server: {
-            host: connectToHost,
+            host: this.host,
             port: port,
-            userName: username,
-            password: password,
+            userName: this.user,
+            password: this.psw,
             hashMethod:     "md5", 
             readyTimeout: readyTimeout,
             tryKeyboard: true,
@@ -101,15 +102,19 @@ var connectViaSSH = function(connectToHost, port, opsType, endHost, args, ifc, c
             onCommandProcessing:   function( command, response, sshObj, stream  ) {
                 console.log("in 'onCommandProcessing' ");
                 if (command === "" && response === "Connected to port" ) {
+                    console.log("in if commandProcessing");
                     connectedToConsoledHost = true;
                     stream.write("\r");
                     sshObj.msg.send("in 'onCommandProcessing' yes it matched. sending newline");
                 }
             },
-      
+            //print here
             onCommandComplete:   function( command, response, sshObj ) {
+                console.log("in onCommandComplete");
                 if(connectedToConsoledHost == true){
+                    console.log("connectedToConsoledHost true");
                     if( response.indexOf(endHost) > -1){
+                        console.log("endHost in response");
                         sshObj.msg.send("Console port connected");
                     }
                 }
@@ -122,6 +127,7 @@ var connectViaSSH = function(connectToHost, port, opsType, endHost, args, ifc, c
             },
 
             onEnd: function( sessionText, sshObj ) {
+                console.log("onEnd subsection");
                 sshObj.msg.send("reached 'onEnd'");
                 callback(0,sessionText);
             }
@@ -139,22 +145,14 @@ var connectViaSSH = function(connectToHost, port, opsType, endHost, args, ifc, c
 
 
 
-this.mainApp = function(host, opsType, argumentList, ifc){
+this.sshToNode = function(opsType, ipList, ifc, port){
 
-    var consoleServer = host;
-    var port = 22; //properties candidate?
+    console.log("CliPlugin module");
 
-    console.log("entered mainApp");
-
-    // ********** verify environment is setup correctly ******
-
-    //To change with correct host (name or ip) -> properties candidate
-    var endHost = host;
-
-    connectViaSSH(consoleServer, port, opsType, endHost, argumentList, ifc,
+    connectViaSSH(opsType, ipList, ifc, port,
         function(err, data){
 
-            console.log(" -------- connected to consoled host: " + endHost + " -----------");
+            console.log(" -------- connected to consoled host: " + this.host + " -----------");
 
             console.log(data);
 
