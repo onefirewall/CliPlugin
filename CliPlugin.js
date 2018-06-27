@@ -47,7 +47,7 @@ var connectViaSSH = function(host, user, psw, opsType, ipList, ifc, port, callba
     switch(opsType) {
         
       case 1:
-        var arrayOfCommandsAdd = ["conf t", "no ip access-group " + accessListName + " in", "end", "conf t", "ip access-list standard "+ accessListName, "no permit any", "permit any", "end", "conf t", "ip access-group " + accessListName + " in", "end", "exit"];
+        var arrayOfCommandsAdd = ["conf t", "no ip access-group " + accessListName + " in", "end", "conf t", "ip access-list standard "+ accessListName, "no permit any", "permit any", "end", "conf t", "ip access-group " + accessListName + " in", "end"];
         
         console.log("ADD operation, parsing ip list");
         arrayOfCommandsAdd.splice(1,0,"interface "+ifc);
@@ -62,7 +62,7 @@ var connectViaSSH = function(host, user, psw, opsType, ipList, ifc, port, callba
         break;
       
       case 2:
-        var arrayOfCommandsDelete = ["conf t", "ip access-list standard "+ accessListName, "end", "exit"];
+        var arrayOfCommandsDelete = ["conf t", "ip access-list standard "+ accessListName, "end"];
         
         console.log("DELETE operation, parsing ip list");
         var i=0;
@@ -75,7 +75,7 @@ var connectViaSSH = function(host, user, psw, opsType, ipList, ifc, port, callba
         
       case 3:
         //TOCHECK does this de-associate the access-list?
-        var arrayOfCommandsClear = ["conf t", "interface " + ifc , "no ip access-group "+ accessListName + " in", "end", "conf t", "no ip access-list standard "+ accessListName, "end", "exit"];
+        var arrayOfCommandsClear = ["conf t", "interface " + ifc , "no ip access-group "+ accessListName + " in", "end", "conf t", "no ip access-list standard "+ accessListName, "end"];
 
         console.log("CLEAR operation");
         listOfCommands = arrayOfCommandsClear.slice(0,arrayOfCommandsClear.length)
@@ -123,7 +123,6 @@ var connectViaSSH = function(host, user, psw, opsType, ipList, ifc, port, callba
             onCommandProcessing:   function( command, response, sshObj, stream  ) {
                 console.log("in 'onCommandProcessing' ");
                 if (command === "" && response === "Connected to port" ) {
-                    console.log("in if commandProcessing");
                     connectedToConsoledHost = true;
                     stream.write("\r");
                     sshObj.msg.send("in 'onCommandProcessing' yes it matched. sending newline");
@@ -131,11 +130,8 @@ var connectViaSSH = function(host, user, psw, opsType, ipList, ifc, port, callba
             },
             //print here
             onCommandComplete:   function( command, response, sshObj ) {
-                console.log("in onCommandComplete");
                 if(connectedToConsoledHost == true){
-                    console.log("connectedToConsoledHost true");
                     if( response.indexOf(endHost) > -1){
-                        console.log("endHost in response");
                         sshObj.msg.send("Console port connected");
                     }
                 }
@@ -148,7 +144,6 @@ var connectViaSSH = function(host, user, psw, opsType, ipList, ifc, port, callba
             },
 
             onEnd: function( sessionText, sshObj ) {
-                console.log("onEnd subsection");
                 sshObj.msg.send("reached 'onEnd'");
                 callback(0,sessionText);
             }
@@ -171,7 +166,7 @@ var connectViaSSH = function(host, user, psw, opsType, ipList, ifc, port, callba
 this.sshToNode = function(opsType, ipList, ifc, port){
 
     console.log("CliPlugin module");
-    if(!ipList.length && (opsType == 1 || opsType == 2)) {
+    if(ipList === undefined || ( !ipList.length && (opsType == 1 || opsType == 2))) {
       console.log("IP list cannot be empty when ADD or DELETE operations are called")
       return;
     }
