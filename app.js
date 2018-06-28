@@ -6,8 +6,12 @@ var psw = "root";
 var ifc = "f0/0";
 var port = 22;
 
+//var jsonConfig = {"host":host,"user":user,"psw":psw,"ifc":ifc,"port":port};
+
 var CliPlugin = require('./CliPlugin.js');
 var cliPluginCommand = new CliPlugin(host, user, psw);
+//or
+//var cliPluginCommand = new CliPlugin(jsonConfig.host, jsonConfig.user, jsonConfig.psw);
 
 //exampleList
 //var ipListbrief=["12.23.2.1","23.2.1.3"];
