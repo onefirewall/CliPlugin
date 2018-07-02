@@ -139,14 +139,14 @@ var connectViaSSH = function(host, user, psw, opsType, ipList, ifc, port, callba
 *****Exported method
 ********************
 */
-this.sshToNode = function(opsType, ipList, ifc, port){
+this.sshToNode = function(jsonConfig){
 
     console.log("CliPlugin module");
-    if(ipList === undefined || ( !ipList.length && (opsType == 1 || opsType == 2))) {
+    if(jsonConfig.ipList === undefined || ( !jsonConfig.ipList.length && (jsonConfig.opsType == 1 || jsonConfig.opsType == 2))) {
       console.log("IP list cannot be empty when ADD or DELETE operations are called")
       return;
     }
-    connectViaSSH(this.host, this.user, this.psw, opsType, ipList, ifc, port,
+    connectViaSSH(this.host, this.user, this.psw, jsonConfig.mode, jsonConfig.ipList, jsonConfig.ifc, jsonConfig.port,
         function(err, data){
 
             console.log(" -------- connected to consoled host: " + this.host + " -----------");
