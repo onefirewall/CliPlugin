@@ -66,13 +66,15 @@ var connectViaSSH = function(host, user, psw, opsType, ipList, ifc, port, callba
         //var arrayOfCommandsDelete = ["conf t", "ip access-list standard "+ accessListName, "end"];
         console.log("DELETE operation, parsing ip list");
         
-        var deleteIpsCommand = "ios_config \"ip access-list standard "+ accessListName + " \" \" no permit any \" \" \" \" permit any \" ";
+        var deleteIpsCommand = "ios_config \"ip access-list standard "+ accessListName + " \" \" \" \" \" ";
         for(var i = 0 ; i<ipList.length; i++) {
                 deleteIpsCommand=deleteIpsCommand.replace("\" \" \" \"","\" \"no deny "+ipList[i]+" \" \" \" \"");
         }
         deleteIpsCommand = deleteIpsCommand.replace( "\" \" \" \"" , "\" \"" );
         
-        listOfCommands = deleteIpsCommand.slice(0,deleteIpsCommand.length)
+        var arrayOfCommandsDelete = ["tclsh", deleteIpsCommand, "exit"];
+        
+        listOfCommands = arrayOfCommandsDelete.slice(0,arrayOfCommandsDelete.length)
         break;
         
       case 3:
