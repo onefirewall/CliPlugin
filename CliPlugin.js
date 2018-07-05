@@ -47,19 +47,16 @@ var connectViaSSH = function(host, user, psw, opsType, ipList, ifc, port, callba
     switch(opsType) {
         
       case 1:
-        //var arrayOfCommandsAdd = ["conf t", "no ip access-group " + accessListName + " in", "end", "conf t", "ip access-list standard "+ accessListName, "no permit any", "permit any", "end", "conf t", "ip access-group " + accessListName + " in", "end"];
-        console.log("ADD operation, parsing ip list");
+        var arrayOfCommandsAdd = ["conf t", "no ip access-group " + accessListName + " in", "end", "conf t", "ip access-list standard "+ accessListName, "no permit any", "permit any", "end", "conf t", "ip access-group " + accessListName + " in", "end"];
         
-        var addIpsCommand = "ios_config \"ip access-list standard \"+ accessListName \" \" no permit any \" \" permit any \" ";
+        console.log("ADD operation, parsing ip list");
+        arrayOfCommandsAdd.splice(1,0,"interface "+ifc);
         var i=0;
-        //TODO insert in addIpsCommand the denies between the permit (splice is used for arrays)
         while(i<ipList.length) {
-                addIpsCommand.splice(7+i,0,"deny "+ipList[i]);
+                arrayOfCommandsAdd.splice(7+i,0,"deny "+ipList[i]);
                 i++
         }
-        
-        var arrayOfCommandsAdd = ["tclsh", "ios_config \"interface \"+ifc \" \"no ip access-group\" + accessListName \" in \" ", addIpsCommand, " ios_config \"interface \"+ifc \" \" ip access-group \" + accessListName + \" in \" ", "exit"];
-
+        arrayOfCommandsAdd.splice(10+i,0,"interface "+ifc);
         listOfCommands = arrayOfCommandsAdd.slice(0,arrayOfCommandsAdd.length)
   
         break;
