@@ -43,44 +43,58 @@ var arrayOfCipher = [
 */
 var connectViaSSH = function(host, user, psw, opsType, ipList, ifc, port, callback) {
     var listOfCommands;
-  
+    var commandFile = "commands.cfg";
+    var fsLib = require('fs');
     switch(opsType) {
         
       case 1:
-        var arrayOfCommandsAdd = ["conf t", "no ip access-group " + accessListName + " in", "end", "conf t", "ip access-list standard "+ accessListName, "no permit any", "permit any", "end", "conf t", "ip access-group " + accessListName + " in", "end"];
-        
+        //var arrayOfCommandsAdd = ["conf t", "no ip access-group " + accessListName + " in", "end", "conf t", "ip access-list standard "+ accessListName, "no permit any", "permit any", "end", "conf t", "ip access-group " + accessListName + " in", "end"];
+        var arrayOfCommandsAdd = ["conf t\n", "no ip access-group " + accessListName + " in\n", "exit\n", "ip access-list standard "+ accessListName +"\n", "no permit any\n", "permit any\n", "exit\n", "ip access-group " + accessListName + " in\n", "end"];
+
         console.log("ADD operation, parsing ip list");
-        arrayOfCommandsAdd.splice(1,0,"interface "+ifc);
+        arrayOfCommandsAdd.splice(1,0,"interface "+ifc+"\n");
         var i=0;
         while(i<ipList.length) {
-                arrayOfCommandsAdd.splice(7+i,0,"deny "+ipList[i]);
+                arrayOfCommandsAdd.splice(6+i,0,"deny "+ipList[i]+"\n");
                 i++
         }
-        arrayOfCommandsAdd.splice(10+i,0,"interface "+ifc);
-        listOfCommands = arrayOfCommandsAdd.slice(0,arrayOfCommandsAdd.length)
-  
+        arrayOfCommandsAdd.splice(8+i,0,"interface "+ifc+"\n");
+        listOfCommands = arrayOfCommandsAdd.slice(0,arrayOfCommandsAdd.length);
+
+        fs.writeFile('./'+commandFile, listOfCommands, function (err) {
+                if (err) throw err;
+                console.log(commandFile + ' saved!');
+        });
+
         break;
-      
+
       case 2:
-        var arrayOfCommandsDelete = ["conf t", "ip access-list standard "+ accessListName, "end"];
-        
+        //var arrayOfCommandsDelete = ["conf t", "ip access-list standard "+ accessListName + "", "end"];
+        var arrayOfCommandsDelete = ["conf t\n", "ip access-list standard "+ accessListName + "\n", "end\n"];
+
         console.log("DELETE operation, parsing ip list");
         var i=0;
         while (i<ipList.length) {
-                arrayOfCommandsDelete.splice(2+i,0,"no deny "+ipList[i]);
+                arrayOfCommandsDelete.splice(2+i,0,"no deny "+ipList[i]+"\n");
                 i++;
         }
-        listOfCommands = arrayOfCommandsDelete.slice(0,arrayOfCommandsDelete.length)
+        listOfCommands = arrayOfCommandsDelete.slice(0,arrayOfCommandsDelete.length);
+
+        fs.writeFile('./'+commandFile, listOfCommands, function (err) {
+                if (err) throw err;
+                console.log(commandFile + ' saved!');
+        });
+
         break;
-        
+ 
       case 3:
-        //TOCHECK does this de-associate the access-list?
+
         var arrayOfCommandsClear = ["conf t", "interface " + ifc , "no ip access-group "+ accessListName + " in", "end", "conf t", "no ip access-list standard "+ accessListName, "end"];
 
         console.log("CLEAR operation");
-        listOfCommands = arrayOfCommandsClear.slice(0,arrayOfCommandsClear.length)
+        listOfCommands = arrayOfCommandsClear.slice(0,arrayOfCommandsClear.length);
         break;
-   
+
       default:
         console.log("Unsupported type of operation");
         return;
@@ -95,7 +109,7 @@ var connectViaSSH = function(host, user, psw, opsType, ipList, ifc, port, callba
             port: port,
             userName: user,
             password: psw,
-            hashMethod:     "md5", 
+            hashMethod: "md5", 
             readyTimeout: readyTimeout,
             tryKeyboard: true,
             algorithms: {
@@ -126,11 +140,12 @@ var connectViaSSH = function(host, user, psw, opsType, ipList, ifc, port, callba
 
         };
 
-   //Commands execution
+   //Commands execution (scp first)
    var SSH2Shell = require ('ssh2shell');
    var SSH = new SSH2Shell(host);
    SSH.connect();
 
+    //delete File? (it will be always overwritten)
 }
 
 
