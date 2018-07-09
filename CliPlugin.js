@@ -48,8 +48,7 @@ var connectViaSSH = function(host, user, psw, opsType, ipList, ifc, port, callba
     switch(opsType) {
         
       case 1:
-        //var arrayOfCommandsAdd = ["conf t", "ip access-list standard "+ accessListName, "exit", "no ip access-group " + accessListName + " in", "exit", "ip access-list standard "+ accessListName, "no permit any", "permit any", "exit", "ip access-group " + accessListName + " in", "end"];
-        var arrayOfCommandsAdd = ["conf t\n", "ip access-list standard "+ accessListName + "\n", "exit\n", "no ip access-group " + accessListName + " in\n", "exit\n", "ip access-list standard "+ accessListName + "\n", "no permit any\n", "permit any\n", "exit\n", "ip access-group " + accessListName + " in\n", "end\n"];
+        var arrayOfCommandsAdd = ["conf t\n", "ip access-list standard "+ accessListName + "\n", "end\n", "conf t\n", "no ip access-group " + accessListName + " in\n", "end\n", "conf t\n", "ip access-list standard "+ accessListName + "\n", "no permit any\n", "permit any\n", "end\n", "conf t\n", "ip access-group " + accessListName + " in\n", "end\n"];
 
         console.log("ADD operation, parsing ip list");
         var i=0;
@@ -57,8 +56,8 @@ var connectViaSSH = function(host, user, psw, opsType, ipList, ifc, port, callba
                 arrayOfCommandsAdd.splice(2+i,0,"deny "+ipList[i]+"\n");
                 i++
         }
-        arrayOfCommandsAdd.splice(3+i,0,"interface "+ifc+"\n");
-        arrayOfCommandsAdd.splice(10+i,0,"interface "+ifc+"\n");
+        arrayOfCommandsAdd.splice(4+i,0,"interface "+ifc+"\n");
+        arrayOfCommandsAdd.splice(13+i,0,"interface "+ifc+"\n");
         listOfCommands = arrayOfCommandsAdd.slice(0,arrayOfCommandsAdd.length);
 
         fs.writeFile('./'+commandFile, listOfCommands, function (err) {
