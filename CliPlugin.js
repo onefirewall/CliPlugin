@@ -103,7 +103,7 @@ var connectViaSSH = function(host, user, psw, opsType, ipList, ifc, port, callba
 
     var connectedToConsoledHost  = false;
 
-    var host = {
+    var hostConfig = {
         server: {
             host: host,
             port: port,
@@ -140,9 +140,18 @@ var connectViaSSH = function(host, user, psw, opsType, ipList, ifc, port, callba
 
         };
 
-   //Commands execution (scp first)
+   //Commands execution (scp first, key algos? Avoid in case of clear operation)
+   var scpClient = require('scp2');
+  
+   scpClient.scp(commandFile, {
+    host: host,
+    username: user,
+    password: psw,
+    port: port
+    }, function(err) {console.log("Could not secure copy file: "+err)})  
+  
    var SSH2Shell = require ('ssh2shell');
-   var SSH = new SSH2Shell(host);
+   var SSH = new SSH2Shell(hostConfig);
    SSH.connect();
 
     //delete File? (it will be always overwritten)
