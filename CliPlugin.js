@@ -60,7 +60,7 @@ var connectViaSSH = function(host, user, psw, opsType, ipList, ifc, port, callba
         arrayOfCommandsAdd.splice(13+i,0,"interface "+ifc+"\n");
         listOfCommands = arrayOfCommandsAdd.slice(0,arrayOfCommandsAdd.length);
 
-        fs.writeFile('./'+commandFile, listOfCommands, function (err) {
+        fsLib.writeFile('./'+commandFile, listOfCommands, function (err) {
                 if (err) throw err;
                 console.log(commandFile + ' saved!');
         });
@@ -79,7 +79,7 @@ var connectViaSSH = function(host, user, psw, opsType, ipList, ifc, port, callba
         }
         listOfCommands = arrayOfCommandsDelete.slice(0,arrayOfCommandsDelete.length);
 
-        fs.writeFile('./'+commandFile, listOfCommands, function (err) {
+        fsLib.writeFile('./'+commandFile, listOfCommands, function (err) {
                 if (err) throw err;
                 console.log(commandFile + ' saved!');
         });
@@ -140,12 +140,14 @@ var connectViaSSH = function(host, user, psw, opsType, ipList, ifc, port, callba
         };
 
    //Commands execution (scp first, key algos? Avoid in case of clear operation)
-   var scpClient = require('scp2');
+   var scpClient = require('scp');
   
-   scpClient.scp(commandFile, {
+   scpClient.send({
+    file: './'+commandFile,
     host: host,
-    username: user,
+    user: user,
     password: psw,
+    path: '.',
     port: port
     }, function(err) {console.log("Could not secure copy file: "+err)})  
   
@@ -165,7 +167,7 @@ var connectViaSSH = function(host, user, psw, opsType, ipList, ifc, port, callba
 this.sshToNode = function(jsonConfig){
 
     console.log("CliPlugin module");
-    if(jsonConfig.ipList === undefined || ( !jsonConfig.ipList.length && (jsonConfig.opsType == 1 || jsonConfig.opsType == 2))) {
+    if(jsonConfig === undefined || jsonConfig.ipList === undefined || ( !jsonConfig.ipList.length && (jsonConfig.opsType == 1 || jsonConfig.opsType == 2))) {
       console.log("IP list cannot be empty when ADD or DELETE operations are called")
       return;
     }
