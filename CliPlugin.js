@@ -43,46 +43,34 @@ var arrayOfCipher = [
 */
 var connectViaSSH = function(host, user, psw, opsType, ipList, ifc, port, callback) {
     var listOfCommands;
-    var commandFile = "commands.cfg";
-    var fsLib = require('fs');
+
     switch(opsType) {
         
       case 1:
-        var arrayOfCommandsAdd = ["conf t\n", "ip access-list standard "+ accessListName + "\n", "end\n", "conf t\n", "no ip access-group " + accessListName + " in\n", "end\n", "conf t\n", "ip access-list standard "+ accessListName + "\n", "no permit any\n", "permit any\n", "end\n", "conf t\n", "ip access-group " + accessListName + " in\n", "end\n"];
+        var arrayOfCommandsAdd = ["conf t", "ip access-list standard "+ accessListName , "end", "conf t", "no ip access-group " + accessListName + " in", "end", "conf t", "ip access-list standard "+ accessListName , "no permit any", "permit any", "end", "conf t", "ip access-group " + accessListName + " in", "end"];
 
         console.log("ADD operation, parsing ip list");
         var i=0;
         while(i<ipList.length) {
-                arrayOfCommandsAdd.splice(2+i,0,"deny "+ipList[i]+"\n");
+                arrayOfCommandsAdd.splice(2+i,0,"deny "+ipList[i]);
                 i++
         }
-        arrayOfCommandsAdd.splice(4+i,0,"interface "+ifc+"\n");
-        arrayOfCommandsAdd.splice(13+i,0,"interface "+ifc+"\n");
+        arrayOfCommandsAdd.splice(4+i,0,"interface "+ifc);
+        arrayOfCommandsAdd.splice(13+i,0,"interface "+ifc);
         listOfCommands = arrayOfCommandsAdd.slice(0,arrayOfCommandsAdd.length);
-
-        fsLib.writeFile('./'+commandFile, listOfCommands, function (err) {
-                if (err) throw err;
-                console.log(commandFile + ' saved!');
-        });
 
         break;
 
       case 2:
-        //var arrayOfCommandsDelete = ["conf t", "ip access-list standard "+ accessListName + "", "end"];
-        var arrayOfCommandsDelete = ["conf t\n", "ip access-list standard "+ accessListName + "\n", "end\n"];
+        var arrayOfCommandsDelete = ["conf t", "ip access-list standard "+ accessListName , "end"];
 
         console.log("DELETE operation, parsing ip list");
         var i=0;
         while (i<ipList.length) {
-                arrayOfCommandsDelete.splice(2+i,0,"no deny "+ipList[i]+"\n");
+                arrayOfCommandsDelete.splice(2+i,0,"no deny "+ipList[i]);
                 i++;
         }
         listOfCommands = arrayOfCommandsDelete.slice(0,arrayOfCommandsDelete.length);
-
-        fsLib.writeFile('./'+commandFile, listOfCommands, function (err) {
-                if (err) throw err;
-                console.log(commandFile + ' saved!');
-        });
 
         break;
  
@@ -127,7 +115,7 @@ var connectViaSSH = function(host, user, psw, opsType, ipList, ifc, port, callba
                 finish([password]);
             },
             onCommandTimeout: function( command, response, stream, connection ) {
-                console.log("--->  entered onCommandTimeout with - \n command: '" + command + "' \n response: '" + response + "'");
+                console.log("onCommandTimeout with - \n command: '" + command + "' \n response: '" + response + "'");
                 stream.end();
                 connection.end();
             },
@@ -139,23 +127,12 @@ var connectViaSSH = function(host, user, psw, opsType, ipList, ifc, port, callba
 
         };
 
-   //Commands execution (scp first, key algos? Avoid in case of clear operation)
-   var scpClient = require('scp');
-  
-   scpClient.send({
-    file: './'+commandFile,
-    host: host,
-    user: user,
-    password: psw,
-    path: '.',
-    port: port
-    }, function(err) {console.log("Could not secure copy file: "+err)})  
+   //Commands execution 
   
    var SSH2Shell = require ('ssh2shell');
    var SSH = new SSH2Shell(hostConfig);
    SSH.connect();
 
-    //delete File? (it will be always overwritten)
 }
 
 
