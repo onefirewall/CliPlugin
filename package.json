@@ -9,7 +9,6 @@
     "url": "git+https://github.com/onefirewall/CliPlugin.git"
   },
   "dependencies": {
-    "ssh2shell": "^1.9.0",
-    "scp":"^0.0.3"
+    "ssh2shell": "^1.9.0"
   }
 }
