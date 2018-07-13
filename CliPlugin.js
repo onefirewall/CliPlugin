@@ -45,51 +45,42 @@ var connectViaSSH = function(host, user, psw, opsType, ipList, ifc, port, callba
     var commandFile = "commands.cfg";
     var fsLib = require('fs');
     var fileExecution = [ "tclsh " + mountPoint + ":" + commandFile, "delete /force "  + mountPoint + ":" + commandFile ];
+    var cmdList;
 
     switch(opsType) {
         
       case 1:
-        var arrayOfCommandsAdd = "conf t\n ip access-list standard " + accessListName + "\n deny IP_ENTRY\n end\n conf t\n interface " + ifc + "\n no ip access-group " + accessListName + " in\n end\n conf t\n ip access-list standard " + accessListName + "\n no permit any\n permit any\n end\n conf t\n interface " + ifc + "\n ip access-group " + accessListName + " in\n end";
+        cmdList = "conf t\n ip access-list standard " + accessListName + "\n deny IP_ENTRY\n end\n conf t\n interface " + ifc + "\n no ip access-group " + accessListName + " in\n end\n conf t\n ip access-list standard " + accessListName + "\n no permit any\n permit any\n end\n conf t\n interface " + ifc + "\n ip access-group " + accessListName + " in\n end";
 
         console.log("ADD operation, parsing ip list");
         var i=0;
         while(i<ipList.length) {
-                arrayOfCommandsAdd = arrayOfCommandsAdd.replace("IP_ENTRY", ipList[i]+"\n deny IP_ENTRY");
+                cmdList = cmdList.replace("IP_ENTRY", ipList[i]+"\n deny IP_ENTRY");
                 i++;
         }
-        arrayOfCommandsAdd = arrayOfCommandsAdd.replace(" deny IP_ENTRY\n", "");
+        cmdList = cmdList.replace(" deny IP_ENTRY\n", "");
 
-        fsLib.writeFile('./'+commandFile, arrayOfCommandsAdd, function (err) {
-                if (err) throw err;
-                console.log(commandFile + ' saved!');
-        });
-        
         break;
 
       case 2:
-        var arrayOfCommandsDelete = "conf t\n ip access-list standard "+ accessListName + "\n no deny IP_ENTRY\n end";
+        cmdList = "conf t\n ip access-list standard "+ accessListName + "\n no deny IP_ENTRY\n end";
 
         console.log("DELETE operation, parsing ip list");
         var i=0;
         while (i<ipList.length) {
-                arrayOfCommandsDelete = arrayOfCommandsDelete.replace("IP_ENTRY", ipList[i]+"\n no deny IP_ENTRY");
+                cmdList = cmdList.replace("IP_ENTRY", ipList[i]+"\n no deny IP_ENTRY");
                 i++;
         }
-        arrayOfCommandsDelete = arrayOfCommandsDelete.replace(" no deny IP_ENTRY\n", "");
+        cmdList = cmdList.replace(" no deny IP_ENTRY\n", "");
 
-        fsLib.writeFile('./'+commandFile, arrayOfCommandsDelete, function (err) {
-                if (err) throw err;
-                console.log(commandFile + ' saved!');
-        });
-        
         break;
  
       case 3:
 
-        var arrayOfCommandsClear = ["conf t", "interface " + ifc , "no ip access-group "+ accessListName + " in", "end", "conf t", "no ip access-list standard "+ accessListName, "end"];
+        cmdList = "conf t\n interface " + ifc +"\n no ip access-group "+ accessListName + " in\n end\n conf t\n no ip access-list standard "+ accessListName + "\n end";
 
         console.log("CLEAR operation");
-        fileExecution = arrayOfCommandsClear.slice(0,arrayOfCommandsClear.length);
+  
         break;
 
       default:
@@ -98,7 +89,11 @@ var connectViaSSH = function(host, user, psw, opsType, ipList, ifc, port, callba
 
     }
 
-    var connectedToConsoledHost  = false;
+    //Writing commands to file to be sent via scp
+    fsLib.writeFile('./'+commandFile, cmdList, function (err) {
+      if (err) throw err;
+      console.log(commandFile + ' saved!');
+    });
 
     var hostConfig = {
         server: {
@@ -137,21 +132,21 @@ var connectViaSSH = function(host, user, psw, opsType, ipList, ifc, port, callba
 
         };
 
-   //Commands execution (scp package puts -r option automatically and node does not support it, how to remove TODO)
+   //Commands execution
   
-   var scpClient = require('scp');
-   scpClient.send({
-     file: './'+commandFile,
-     user: user,
-     password: psw,
-     host: host,
-     path: mountPoint+':'+commandFile,
-     port: port
-   }, function(err) {console.log("Could not secure copy file: "+err)})
+  var exec = require('child_process').exec;
+  var SSH2Shell = require ('ssh2shell');
+  var SSH = new SSH2Shell(hostConfig);
   
-   var SSH2Shell = require ('ssh2shell');
-   var SSH = new SSH2Shell(hostConfig);
-   SSH.connect();
+  var scpCommand = 'scp -P ' + port + ' ./' + commandFile + ' ' + user + '@' + host + ':' + mountPoint + ':' + commandFile;
+  exec(scpCommand, function (err, stdout, stderr) {
+    if (err)  {
+      console.log("Could not secure copy file: "+err);
+      throw new Error(err);
+    }
+    //TODO expect "Password:" or -i public key
+    SSH.connect();
+  });
 
 }
 
