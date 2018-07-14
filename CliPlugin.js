@@ -138,13 +138,12 @@ var connectViaSSH = function(host, user, psw, opsType, ipList, ifc, port, callba
   var SSH2Shell = require ('ssh2shell');
   var SSH = new SSH2Shell(hostConfig);
   
-  var scpCommand = 'scp -P ' + port + ' ./' + commandFile + ' ' + user + '@' + host + ':' + mountPoint + ':' + commandFile;
-  exec(scpCommand, function (err, stdout, stderr) {
+  var scpScript = "./expectScp.sh " + port + " " + commandFile + " " + user + " " + host + " " + mountPoint + " " + psw;
+  exec(scpScript, function (err, stdout, stderr) {
     if (err)  {
       console.log("Could not secure copy file: "+err);
       throw new Error(err);
     }
-    //TODO expect "Password:" or -i public key
     SSH.connect();
   });
 
