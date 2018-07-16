@@ -9,7 +9,7 @@ this.psw = psw;
 // *********************  connection parameters  ************
 
 var readyTimeout = 45000;   // 45 seconds.
-var idleTimeout = 30000;   // 10 seconds.
+var idleTimeout = 1200000;   // 20 minutes.
 
 var verboseStatus = false;
 var debugStatus = false;
