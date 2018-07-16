@@ -7,6 +7,7 @@ set host [lindex $argv 3]
 set mountPoint [lindex $argv 4]
 set password [lindex $argv 5]
 
-spawn scp -P "$port" ./"$commandFile" "$user"@"$host":"$mountPoint":"$commandFile"
-expect "*?assword:*"
-send "$password\r"
+spawn scp -P $port ./$commandFile $user@$host:$mountPoint:$commandFile
+expect "*?assword:*" { send $password\r }
+expect "100%"
+sleep 1
