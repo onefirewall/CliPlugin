@@ -1,5 +1,6 @@
 #!/usr/bin/expect -f
 
+set timeout -1
 set port [lindex $argv 0]
 set commandFile [lindex $argv 1]
 set user [lindex $argv 2]
@@ -10,4 +11,4 @@ set password [lindex $argv 5]
 spawn scp -P $port ./$commandFile $user@$host:$mountPoint:$commandFile
 expect "*?assword:*" { send $password\r }
 expect "100%"
-sleep 1
+expect eof
