@@ -50,7 +50,7 @@ var connectViaSSH = function(host, user, psw, opsType, ipList, ifc, port, callba
     switch(opsType) {
         
       case 1:
-        cmdList = "conf t\n ip access-list standard " + accessListName + "\n deny IP_ENTRY\n end\n conf t\n interface " + ifc + "\n no ip access-group " + accessListName + " in\n end\n conf t\n ip access-list standard " + accessListName + "\n no permit any\n permit any\n end\n conf t\n interface " + ifc + "\n ip access-group " + accessListName + " in\n end";
+        cmdList = "conf t\n interface " + ifc + "\n no ip access-group " + accessListName + " in\n end\n conf t\n ip access-list standard " + accessListName + "\n no permit any\n deny IP_ENTRY\n permit any\n end\n conf t\n interface " + ifc + "\n ip access-group " + accessListName + " in\n end";
 
         console.log("ADD operation, parsing ip list");
         var i=0;
