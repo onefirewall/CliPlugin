@@ -21,4 +21,6 @@ var CliPlugin = require('./CliPlugin.js');
 var cliPluginCommand = new CliPlugin(jsonConfig.host, jsonConfig.user, jsonConfig.psw);
 
 //1 ADD, 2 DELETE, 3 CLEAR, 0 show?
-cliPluginCommand.sshToNode(jsonConfig);
+cliPluginCommand.sshToNode(jsonConfig.ifc, jsonConfig.port, jsonConfig.mode, jsonConfig.ipList , function callback(response){
+            console.log("The response is "+response);
+            });
