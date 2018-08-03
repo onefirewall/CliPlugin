@@ -50,12 +50,12 @@ var connectViaSSH = function(host, user, psw, opsType, ipList, ifc, port, callba
     switch(opsType) {
         
       case 1:
-        cmdList = "conf t\n interface " + ifc + "\n no ip access-group " + accessListName + " in\n end\n conf t\n ip access-list standard " + accessListName + "\n no permit any\n deny IP_ENTRY\n permit any\n end\n conf t\n interface " + ifc + "\n ip access-group " + accessListName + " in\n end";
+        cmdList = "conf t\nip access-list standard " + accessListName + "\ndeny IP_ENTRY\nend\nconf t\ninterface " + ifc + "\nno ip access-group " + accessListName + " in\nend\nconf t\nip access-list standard " + accessListName + "\nno permit any\npermit any\nend\nconf t\ninterface " + ifc + "\nip access-group " + accessListName + " in\nend";
 
         console.log("ADD operation, parsing ip list");
         var i=0;
         while(i<ipList.length) {
-                cmdList = cmdList.replace("IP_ENTRY", ipList[i]+"\n deny IP_ENTRY");
+                cmdList = cmdList.replace("IP_ENTRY", ipList[i]+"\ndeny IP_ENTRY");
                 i++;
         }
         cmdList = cmdList.replace(" deny IP_ENTRY\n", "");
@@ -63,12 +63,12 @@ var connectViaSSH = function(host, user, psw, opsType, ipList, ifc, port, callba
         break;
 
       case 2:
-        cmdList = "conf t\n ip access-list standard "+ accessListName + "\n no deny IP_ENTRY\n end";
+        cmdList = "conf t\nip access-list standard "+ accessListName + "\nno deny IP_ENTRY\nend";
 
         console.log("DELETE operation, parsing ip list");
         var i=0;
         while (i<ipList.length) {
-                cmdList = cmdList.replace("IP_ENTRY", ipList[i]+"\n no deny IP_ENTRY");
+                cmdList = cmdList.replace("IP_ENTRY", ipList[i]+"\nno deny IP_ENTRY");
                 i++;
         }
         cmdList = cmdList.replace(" no deny IP_ENTRY\n", "");
@@ -77,7 +77,7 @@ var connectViaSSH = function(host, user, psw, opsType, ipList, ifc, port, callba
  
       case 3:
 
-        cmdList = "conf t\n interface " + ifc +"\n no ip access-group "+ accessListName + " in\n end\n conf t\n no ip access-list standard "+ accessListName + "\n end";
+        cmdList = "conf t\ninterface " + ifc +"\nno ip access-group "+ accessListName + " in\nend\nconf t\nno ip access-list standard "+ accessListName + "\nend";
 
         console.log("CLEAR operation");
   
